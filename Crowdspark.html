@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CrowdSpark — Turn moments into movements</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0A0A0F;
+    --bg2: #13131C;
+    --bg3: #1C1C2A;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.18);
+    --violet: #7C3AED;
+    --violet-light: #9D5FF5;
+    --coral: #FF4D6D;
+    --yellow: #F5FF50;
+    --text: #F0F0F8;
+    --muted: #7A7A95;
+    --card-radius: 16px;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── APP SHELL ── */
+  #app { display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* ── AUTH SCREEN ── */
+  #auth-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .auth-bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.25;
+    pointer-events: none;
+  }
+  .orb1 { width: 500px; height: 500px; background: var(--violet); top: -150px; right: -100px; }
+  .orb2 { width: 350px; height: 350px; background: var(--coral); bottom: -100px; left: -80px; }
+
+  .auth-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .auth-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 2rem;
+    justify-content: center;
+  }
+
+  .auth-logo .spark-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--violet), var(--coral));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+
+  .auth-logo .wordmark {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .auth-tabs {
+    display: flex;
+    background: var(--bg3);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 1.5rem;
+  }
+
+  .auth-tab {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .auth-tab.active {
+    background: var(--bg2);
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  }
+
+  .auth-form { display: flex; flex-direction: column; gap: 12px; }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+  .form-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  .form-group input {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus { border-color: var(--violet-light); }
+  .form-group input::placeholder { color: var(--muted); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--violet), var(--violet-light));
+    border: none;
+    border-radius: 10px;
+    padding: 0.85rem 1.5rem;
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-top: 4px;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .auth-divider {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin: 0.5rem 0;
+    position: relative;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 38%;
+    height: 1px;
+    background: var(--border);
+  }
+  .auth-divider::before { left: 0; }
+  .auth-divider::after { right: 0; }
+
+  .btn-ghost {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-ghost:hover { border-color: var(--border-hover); }
+
+  /* ── MAIN APP ── */
+  #main-app { display: none; flex-direction: column; min-height: 100vh; }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .nav-logo .logo-spark {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, var(--violet), var(--coral));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg3);
+    border-radius: 10px;
+    padding: 3px;
+  }
+
+  .nav-tab {
+    padding: 6px 14px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-tab.active { background: var(--bg2); color: var(--text); }
+
+  .nav-right {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--violet), var(--coral));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 2px solid var(--border);
+    transition: border-color 0.2s;
+  }
+  .avatar:hover { border-color: var(--violet-light); }
+
+  .btn-create {
+    background: linear-gradient(135deg, var(--violet), var(--coral));
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .btn-create:hover { opacity: 0.9; }
+
+  /* ── PAGE CONTENT ── */
+  .page { display: none; padding: 1.5rem; max-width: 900px; margin: 0 auto; width: 100%; }
+  .page.active { display: block; }
+
+  /* ── FEED PAGE ── */
+  .feed-header {
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .feed-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .filter-row {
+    display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
+    margin-bottom: 1.5rem;
+    scrollbar-width: none;
+  }
+  .filter-row::-webkit-scrollbar { display: none; }
+
+  .filter-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    font-family: var(--font-body);
+  }
+  .filter-chip.active, .filter-chip:hover {
+    background: var(--violet);
+    border-color: var(--violet);
+    color: #fff;
+  }
+
+  /* ── CHALLENGE CARDS ── */
+  .challenge-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .challenge-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .challenge-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+
+  .challenge-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--violet), var(--coral));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .challenge-card:hover::before,
+  .challenge-card.hot::before { opacity: 1; }
+
+  .card-top {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .card-category {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: var(--bg3);
+    color: var(--muted);
+  }
+  .card-category.viral { background: rgba(124,58,237,0.2); color: var(--violet-light); }
+  .card-category.trending { background: rgba(255,77,109,0.15); color: var(--coral); }
+
+  .virality-badge {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--yellow);
+  }
+
+  .virality-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--yellow);
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .card-desc {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .card-meta {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .creator-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .creator-avatar {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .creator-name {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .card-stats {
+    display: flex; gap: 14px; align-items: center;
+  }
+
+  .stat-item {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .stat-item.fire { color: var(--coral); }
+
+  /* ── SPARK METER ── */
+  .spark-meter-wrap { margin-top: 12px; }
+  .spark-meter-label {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .spark-meter {
+    height: 3px;
+    background: var(--bg3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .spark-meter-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--violet), var(--coral));
+    transition: width 0.8s ease;
+  }
+
+  /* ── PARTICIPATE MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    background: var(--bg3); border: none;
+    width: 32px; height: 32px; border-radius: 8px;
+    color: var(--muted); font-size: 16px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: color 0.2s;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  .modal-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .modal-sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .video-record-area {
+    background: var(--bg3);
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    height: 200px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px;
+    margin-bottom: 1.25rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .video-record-area:hover { border-color: var(--violet); }
+
+  .record-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--violet), var(--coral));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+
+  .record-label {
+    font-size: 14px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .textarea-field {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    width: 100%;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 1rem;
+  }
+  .textarea-field:focus { border-color: var(--violet-light); }
+  .textarea-field::placeholder { color: var(--muted); }
+
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-actions .btn-primary { flex: 1; }
+
+  /* ── CREATE PAGE ── */
+  .create-header {
+    margin-bottom: 1.5rem;
+  }
+  .create-header h1 {
+    font-family: var(--font-display);
+    font-size: 24px; font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .create-header p { color: var(--muted); font-size: 14px; }
+
+  .create-form {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.5rem;
+    display: flex; flex-direction: column; gap: 1.25rem;
+  }
+
+  .create-form .form-group label {
+    font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 6px; display: block;
+  }
+
+  .create-form input, .create-form select, .create-form textarea {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .create-form input:focus,
+  .create-form select:focus,
+  .create-form textarea:focus { border-color: var(--violet-light); }
+  .create-form input::placeholder,
+  .create-form textarea::placeholder { color: var(--muted); }
+  .create-form select { appearance: none; cursor: pointer; }
+  .create-form textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+
+  .duration-chips {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .duration-chip {
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .duration-chip.active {
+    background: rgba(124,58,237,0.2);
+    border-color: var(--violet);
+    color: var(--violet-light);
+  }
+
+  .video-upload {
+    background: var(--bg3);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .video-upload:hover { border-color: var(--violet); }
+  .video-upload .upload-icon { font-size: 32px; margin-bottom: 8px; }
+  .video-upload p { color: var(--muted); font-size: 14px; }
+  .video-upload span { color: var(--violet-light); font-weight: 500; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .ai-preview {
+    background: var(--bg3);
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .ai-orb {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--violet), var(--coral));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+    animation: spin-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes spin-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+
+  .ai-text { flex: 1; }
+  .ai-text strong { display: block; font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .ai-text span { font-size: 12px; color: var(--muted); }
+
+  .ai-score {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--yellow);
+  }
+
+  /* ── LEADERBOARD ── */
+  .leaderboard-tabs {
+    display: flex; gap: 4px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 1.5rem;
+  }
+
+  .lb-tab {
+    flex: 1; padding: 8px;
+    border: none; background: transparent;
+    color: var(--muted);
+    font-family: var(--font-body); font-size: 13px; font-weight: 500;
+    border-radius: 8px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lb-tab.active { background: var(--bg3); color: var(--text); }
+
+  .lb-section-title {
+    font-family: var(--font-display);
+    font-size: 14px; font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+    margin-top: 1.5rem;
+  }
+  .lb-section-title:first-child { margin-top: 0; }
+
+  .lb-list {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+
+  .lb-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 0.9rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row:hover { background: var(--bg3); }
+
+  .lb-rank {
+    font-family: var(--font-display);
+    font-size: 16px; font-weight: 700;
+    width: 28px; text-align: center;
+    flex-shrink: 0;
+  }
+  .lb-rank.gold { color: #FFD700; }
+  .lb-rank.silver { color: #C0C0C0; }
+  .lb-rank.bronze { color: #CD7F32; }
+
+  .lb-info { flex: 1; min-width: 0; }
+  .lb-name {
+    font-weight: 600; font-size: 14px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .lb-meta { font-size: 12px; color: var(--muted); }
+
+  .lb-value {
+    font-family: var(--font-display);
+    font-size: 16px; font-weight: 700;
+    text-align: right; flex-shrink: 0;
+  }
+  .lb-value .unit { font-size: 11px; color: var(--muted); font-family: var(--font-body); font-weight: 400; }
+
+  /* ── PROFILE PAGE ── */
+  .profile-hero {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 1.5rem;
+  }
+
+  .profile-avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--violet), var(--coral));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 28px; font-weight: 700;
+    flex-shrink: 0;
+    border: 3px solid var(--border);
+  }
+
+  .profile-info h2 {
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .profile-info p { color: var(--muted); font-size: 14px; margin-bottom: 12px; }
+
+  .profile-stats {
+    display: flex; gap: 1.5rem;
+  }
+
+  .pstat {
+    text-align: center;
+  }
+  .pstat-val {
+    font-family: var(--font-display);
+    font-size: 20px; font-weight: 700;
+    display: block;
+  }
+  .pstat-lbl { font-size: 12px; color: var(--muted); }
+
+  .section-heading {
+    font-family: var(--font-display);
+    font-size: 18px; font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .badges-row {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1.5rem;
+  }
+
+  .badge {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 500;
+  }
+
+  .badge-icon { font-size: 20px; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.75rem 1.25rem;
+    font-size: 14px; font-weight: 500;
+    z-index: 300;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+    display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; pointer-events: auto; }
+  .toast.success { border-color: rgba(124,58,237,0.5); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center; padding: 3rem 1rem;
+    color: var(--muted);
+  }
+  .empty-state .empty-icon { font-size: 48px; margin-bottom: 1rem; }
+  .empty-state h3 { font-family: var(--font-display); font-size: 18px; color: var(--text); margin-bottom: 6px; }
+  .empty-state p { font-size: 14px; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 2px; }
+
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .profile-hero { flex-direction: column; align-items: flex-start; }
+    .nav-tabs { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ── AUTH SCREEN ── -->
+  <div id="auth-screen">
+    <div class="auth-bg-orb orb1"></div>
+    <div class="auth-bg-orb orb2"></div>
+
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="spark-icon">⚡</div>
+        <span class="wordmark">CrowdSpark</span>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">Sign in</button>
+        <button class="auth-tab" onclick="switchAuthTab('signup')">Create account</button>
+      </div>
+
+      <div id="login-form" class="auth-form">
+        <div class="form-group">
+          <label>Username or email</label>
+          <input type="text" id="login-user" placeholder="your@email.com" value="alex">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-pass" placeholder="••••••••" value="password">
+        </div>
+        <button class="btn-primary" onclick="doLogin()">Sign in →</button>
+        <div class="auth-divider">or</div>
+        <button class="btn-ghost" onclick="doLogin()">🌐 Continue with Google</button>
+      </div>
+
+      <div id="signup-form" class="auth-form" style="display:none">
+        <div class="form-group">
+          <label>Display name</label>
+          <input type="text" id="signup-name" placeholder="SparkMaster99">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="signup-email" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="signup-pass" placeholder="Min 8 characters">
+        </div>
+        <button class="btn-primary" onclick="doSignup()">Create account →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MAIN APP ── -->
+  <div id="main-app">
+
+    <nav class="topnav">
+      <div class="nav-logo">
+        <div class="logo-spark">⚡</div>
+        CrowdSpark
+      </div>
+
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showPage('feed')">🔥 Feed</button>
+        <button class="nav-tab" onclick="showPage('create')">＋ Create</button>
+        <button class="nav-tab" onclick="showPage('leaderboard')">🏆 Leaderboard</button>
+        <button class="nav-tab" onclick="showPage('profile')">👤 Profile</button>
+      </div>
+
+      <div class="nav-right">
+        <button class="btn-create" onclick="showPage('create')">＋ New challenge</button>
+        <div class="avatar" onclick="showPage('profile')" id="nav-avatar">A</div>
+      </div>
+    </nav>
+
+    <!-- FEED PAGE -->
+    <div class="page active" id="page-feed">
+      <div style="max-width:860px;margin:0 auto">
+        <div class="feed-header">
+          <div class="feed-title">🔥 Trending challenges</div>
+          <div style="font-size:13px;color:var(--muted)" id="feed-count"></div>
+        </div>
+
+        <div class="filter-row" id="filter-row">
+          <button class="filter-chip active" onclick="filterFeed('all',this)">All</button>
+          <button class="filter-chip" onclick="filterFeed('creative',this)">🎨 Creative</button>
+          <button class="filter-chip" onclick="filterFeed('lifestyle',this)">✨ Lifestyle</button>
+          <button class="filter-chip" onclick="filterFeed('comedy',this)">😂 Comedy</button>
+          <button class="filter-chip" onclick="filterFeed('nostalgia',this)">📸 Nostalgia</button>
+          <button class="filter-chip" onclick="filterFeed('fitness',this)">💪 Fitness</button>
+        </div>
+
+        <div class="challenge-grid" id="challenge-grid"></div>
+      </div>
+    </div>
+
+    <!-- CREATE PAGE -->
+    <div class="page" id="page-create">
+      <div style="max-width:600px;margin:0 auto">
+        <div class="create-header">
+          <h1>⚡ Spark a challenge</h1>
+          <p>Create a challenge that spreads. Keep it simple, keep it fun.</p>
+        </div>
+
+        <div class="create-form">
+          <div class="form-group">
+            <label>Challenge title *</label>
+            <input type="text" id="c-title" placeholder="e.g. Show your oldest item" maxlength="60" oninput="updateAIScore()">
+          </div>
+
+          <div class="form-group">
+            <label>Description — what should participants do?</label>
+            <textarea id="c-desc" placeholder="Dig up the oldest item you own and show it to camera. Bonus points for backstory!" oninput="updateAIScore()"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category</label>
+              <select id="c-cat" onchange="updateAIScore()">
+                <option value="">Pick a category</option>
+                <option value="creative">🎨 Creative</option>
+                <option value="lifestyle">✨ Lifestyle</option>
+                <option value="comedy">😂 Comedy</option>
+                <option value="nostalgia">📸 Nostalgia</option>
+                <option value="fitness">💪 Fitness</option>
+                <option value="food">🍕 Food</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Challenge duration</label>
+              <div class="duration-chips">
+                <button class="duration-chip active" onclick="setDuration(15,this)">15s</button>
+                <button class="duration-chip" onclick="setDuration(30,this)">30s</button>
+                <button class="duration-chip" onclick="setDuration(60,this)">60s</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Optional video (demo your challenge)</label>
+            <div class="video-upload" onclick="showToast('📹 Camera access would open here in the real app')">
+              <div class="upload-icon">🎬</div>
+              <p><span>Tap to record</span> or upload a video</p>
+            </div>
+          </div>
+
+          <div class="ai-preview" id="ai-preview">
+            <div class="ai-orb">✨</div>
+            <div class="ai-text">
+              <strong>Viral probability score</strong>
+              <span id="ai-hint">Fill in your challenge to see your score</span>
+            </div>
+            <div class="ai-score" id="ai-score-val">—</div>
+          </div>
+
+          <button class="btn-primary" onclick="publishChallenge()" style="width:100%;padding:1rem;font-size:16px">
+            ⚡ Launch challenge
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD PAGE -->
+    <div class="page" id="page-leaderboard">
+      <div style="max-width:680px;margin:0 auto">
+        <div style="font-family:var(--font-display);font-size:24px;font-weight:700;margin-bottom:1.5rem">🏆 Leaderboard</div>
+
+        <div class="leaderboard-tabs">
+          <button class="lb-tab active" onclick="switchLbTab('daily',this)">Today</button>
+          <button class="lb-tab" onclick="switchLbTab('weekly',this)">This week</button>
+          <button class="lb-tab" onclick="switchLbTab('monthly',this)">This month</button>
+          <button class="lb-tab" onclick="switchLbTab('alltime',this)">All time</button>
+        </div>
+
+        <div id="lb-content"></div>
+      </div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div class="page" id="page-profile">
+      <div style="max-width:680px;margin:0 auto">
+        <div class="profile-hero">
+          <div class="profile-avatar" id="profile-avatar-big">A</div>
+          <div class="profile-info">
+            <h2 id="profile-username">Alex Chen</h2>
+            <p id="profile-handle">@alexchen · Joined June 2026</p>
+            <div class="profile-stats">
+              <div class="pstat"><span class="pstat-val" id="p-challenges">3</span><span class="pstat-lbl">Challenges</span></div>
+              <div class="pstat"><span class="pstat-val" id="p-participants">1.2k</span><span class="pstat-lbl">Participants</span></div>
+              <div class="pstat"><span class="pstat-val" id="p-followers">342</span><span class="pstat-lbl">Followers</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-heading">🏅 Badges</div>
+        <div class="badges-row">
+          <div class="badge"><span class="badge-icon">🔥</span> Spark Starter</div>
+          <div class="badge"><span class="badge-icon">⚡</span> First Viral</div>
+          <div class="badge"><span class="badge-icon">🌍</span> Global Reach</div>
+        </div>
+
+        <div class="section-heading">Your challenges</div>
+        <div class="challenge-grid" id="profile-challenges"></div>
+
+        <div style="margin-top:1.5rem;text-align:center">
+          <button class="btn-ghost" onclick="doLogout()" style="display:inline-flex;gap:8px;padding:0.75rem 2rem">
+            Sign out
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-app -->
+
+</div><!-- /app -->
+
+<!-- PARTICIPATE MODAL -->
+<div class="modal-overlay" id="participate-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modal-challenge-title">Challenge</div>
+    <div class="modal-sub" id="modal-challenge-desc">Description</div>
+
+    <div class="video-record-area" onclick="showToast('🎬 Camera would activate here in the full app')">
+      <div class="record-icon">🎥</div>
+      <div class="record-label">Tap to record your response<br><span style="font-size:12px;opacity:0.6">Up to 60 seconds</span></div>
+    </div>
+
+    <textarea class="textarea-field" id="modal-caption" placeholder="Add a caption... (optional)"></textarea>
+
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="submitParticipation()">⚡ Post response</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ Done</div>
+
+<script>
+// ── STATE ──
+let currentUser = null;
+let selectedDuration = 15;
+let currentFilter = 'all';
+let currentChallenge = null;
+
+const USERS = {
+  alex: { name: 'Alex Chen', handle: 'alexchen', initials: 'AC', challenges: 3, participants: '1.2k', followers: 342 }
+};
+
+const CHALLENGES = [
+  { id:1, title:'Recreate your childhood photo', desc:'Find an old photo of yourself as a kid and recreate it exactly — same pose, same expression.', category:'nostalgia', duration:30, creator:'@zoepark', creatorInit:'ZP', creatorColor:'#7C3AED', participants:48200, sparks:94, hot:true, mine:false },
+  { id:2, title:'Show your oldest item', desc:'Dig out the single oldest thing you own and show it to camera. Bonus points for the backstory.', category:'lifestyle', duration:15, creator:'@mikethunder', creatorInit:'MT', creatorColor:'#FF4D6D', participants:29100, sparks:81, hot:true, mine:false },
+  { id:3, title:'Switch outfits in one second', desc:'Film yourself in one outfit, then cut and appear in a completely different one in the same shot.', category:'creative', duration:15, creator:'@alexchen', creatorInit:'AC', creatorColor:'#0EA5E9', participants:17800, sparks:76, hot:false, mine:true },
+  { id:4, title:'Describe your country in 3 words', desc:'Three words only. No cheating. Everyone has an opinion — what are yours?', category:'lifestyle', duration:15, creator:'@sunnydays', creatorInit:'SD', creatorColor:'#F5FF50', participants:12400, sparks:68, hot:false, mine:false },
+  { id:5, title:'The silent laugh challenge', desc:'Try to keep a straight face while someone makes you laugh silently. Film both reactions.', category:'comedy', duration:30, creator:'@laughtrack', creatorInit:'LT', creatorColor:'#10B981', participants:9800, sparks:61, hot:false, mine:false },
+  { id:6, title:'30-second desk workout', desc:'Show the best workout you can do without leaving your desk. Time yourself — 30 seconds, go!', category:'fitness', duration:30, creator:'@gymrat99', creatorInit:'GR', creatorColor:'#F97316', participants:6200, sparks:54, hot:false, mine:false },
+];
+
+// ── AUTH ──
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('login-form').style.display = tab === 'login' ? 'flex' : 'none';
+  document.getElementById('signup-form').style.display = tab === 'signup' ? 'flex' : 'none';
+}
+
+function doLogin() {
+  const user = document.getElementById('login-user').value.trim() || 'alex';
+  currentUser = USERS[user] || { name: user, handle: user.toLowerCase(), initials: user.slice(0,2).toUpperCase(), challenges:0, participants:'0', followers:0 };
+  enterApp();
+}
+
+function doSignup() {
+  const name = document.getElementById('signup-name').value.trim();
+  if (!name) { showToast('⚠️ Please enter a display name'); return; }
+  currentUser = { name, handle: name.toLowerCase().replace(/\s/g,''), initials: name.slice(0,2).toUpperCase(), challenges:0, participants:'0', followers:0 };
+  enterApp();
+}
+
+function enterApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'flex';
+  document.getElementById('main-app').style.flexDirection = 'column';
+  document.getElementById('nav-avatar').textContent = currentUser.initials;
+  document.getElementById('profile-avatar-big').textContent = currentUser.initials;
+  document.getElementById('profile-username').textContent = currentUser.name;
+  document.getElementById('profile-handle').textContent = `@${currentUser.handle} · Joined June 2026`;
+  renderFeed();
+  renderLeaderboard('daily');
+  renderProfileChallenges();
+  showToast(`⚡ Welcome back, ${currentUser.name.split(' ')[0]}!`);
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('main-app').style.display = 'none';
+}
+
+// ── NAVIGATION ──
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  const tabs = { feed:0, create:1, leaderboard:2, profile:3 };
+  document.querySelectorAll('.nav-tab')[tabs[page]]?.classList.add('active');
+}
+
+// ── FEED ──
+function filterFeed(cat, el) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderFeed();
+}
+
+function renderFeed() {
+  const grid = document.getElementById('challenge-grid');
+  const filtered = currentFilter === 'all' ? CHALLENGES : CHALLENGES.filter(c => c.category === currentFilter);
+  document.getElementById('feed-count').textContent = `${filtered.length} challenges`;
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🔦</div><h3>Nothing here yet</h3><p>Be the first to start a challenge in this category!</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(c => `
+    <div class="challenge-card ${c.hot?'hot':''}" onclick="openChallenge(${c.id})">
+      <div class="card-top">
+        <span class="card-category ${c.sparks>80?'viral':c.sparks>65?'trending':''}">${c.category}</span>
+        <div class="virality-badge">
+          ${c.sparks>70?`<div class="virality-dot"></div>`:''}
+          <span>${c.sparks}</span>
+          <span style="font-size:11px;color:var(--muted);font-weight:400">/ 100</span>
+        </div>
+      </div>
+      <div class="card-title">${c.title}</div>
+      <div class="card-desc">${c.desc}</div>
+      <div class="card-meta">
+        <div class="creator-row">
+          <div class="creator-avatar" style="background:${c.creatorColor}22;color:${c.creatorColor}">${c.creatorInit}</div>
+          <span class="creator-name">${c.creator}</span>
+          ${c.mine ? '<span style="font-size:11px;background:rgba(124,58,237,0.15);color:var(--violet-light);padding:2px 8px;border-radius:10px;font-weight:500">yours</span>' : ''}
+        </div>
+        <div class="card-stats">
+          <div class="stat-item ${c.hot?'fire':''}">
+            ${c.hot?'🔥':'👥'} ${formatNum(c.participants)}
+          </div>
+        </div>
+      </div>
+      <div class="spark-meter-wrap">
+        <div class="spark-meter-label"><span>Viral spark</span><span style="color:${c.sparks>80?'#F5FF50':c.sparks>60?'#FF4D6D':'var(--muted)'}">${c.sparks}%</span></div>
+        <div class="spark-meter"><div class="spark-meter-fill" style="width:${c.sparks}%"></div></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function formatNum(n) {
+  if (n >= 1000) return (n/1000).toFixed(1).replace('.0','') + 'k';
+  return n;
+}
+
+// ── PARTICIPATE ──
+function openChallenge(id) {
+  currentChallenge = CHALLENGES.find(c => c.id === id);
+  if (!currentChallenge) return;
+  document.getElementById('modal-challenge-title').textContent = currentChallenge.title;
+  document.getElementById('modal-challenge-desc').textContent = currentChallenge.desc;
+  document.getElementById('modal-caption').value = '';
+  document.getElementById('participate-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('participate-modal').classList.remove('open');
+}
+
+function submitParticipation() {
+  if (!currentChallenge) return;
+  currentChallenge.participants += 1;
+  closeModal();
+  renderFeed();
+  showToast('⚡ Your response is live! Challenge tree updated.');
+}
+
+// ── CREATE ──
+function setDuration(val, el) {
+  selectedDuration = val;
+  document.querySelectorAll('.duration-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  updateAIScore();
+}
+
+function updateAIScore() {
+  const title = document.getElementById('c-title').value.trim();
+  const desc = document.getElementById('c-desc').value.trim();
+  const cat = document.getElementById('c-cat').value;
+  const score = document.getElementById('ai-score-val');
+  const hint = document.getElementById('ai-hint');
+
+  if (!title) { score.textContent = '—'; hint.textContent = 'Fill in your challenge to see your score'; return; }
+
+  let s = 30;
+  if (title.length > 10) s += 15;
+  if (title.includes('?') || title.includes('your')) s += 10;
+  if (desc.length > 30) s += 12;
+  if (cat) s += 8;
+  if (selectedDuration === 15) s += 8;
+  s = Math.min(s + Math.floor(Math.random() * 5), 97);
+
+  score.textContent = s;
+  score.style.color = s > 75 ? '#F5FF50' : s > 55 ? '#FF4D6D' : 'var(--violet-light)';
+  hint.textContent = s > 75 ? '🔥 Strong viral potential!' : s > 55 ? '✨ Good foundation — add more detail' : '💡 Simplify the hook for more reach';
+}
+
+function publishChallenge() {
+  const title = document.getElementById('c-title').value.trim();
+  if (!title) { showToast('⚠️ Add a challenge title first'); return; }
+
+  const newC = {
+    id: CHALLENGES.length + 1,
+    title,
+    desc: document.getElementById('c-desc').value.trim() || 'Join this challenge!',
+    category: document.getElementById('c-cat').value || 'lifestyle',
+    duration: selectedDuration,
+    creator: '@' + currentUser.handle,
+    creatorInit: currentUser.initials,
+    creatorColor: '#7C3AED',
+    participants: 1,
+    sparks: parseInt(document.getElementById('ai-score-val').textContent) || 40,
+    hot: false,
+    mine: true,
+  };
+
+  CHALLENGES.unshift(newC);
+  document.getElementById('c-title').value = '';
+  document.getElementById('c-desc').value = '';
+  document.getElementById('c-cat').value = '';
+  document.getElementById('ai-score-val').textContent = '—';
+
+  if (currentUser === USERS.alex) {
+    document.getElementById('p-challenges').textContent = parseInt(document.getElementById('p-challenges').textContent) + 1;
+  }
+
+  renderFeed();
+  renderProfileChallenges();
+  showPage('feed');
+  showToast('🚀 Challenge launched! Share it to spark the chain.');
+}
+
+// ── LEADERBOARD ──
+const LB_DATA = {
+  daily: {
+    challenges: [
+      { name:'Recreate your childhood photo', meta:'@zoepark · started 6h ago', value:'48.2k', unit:'participants' },
+      { name:'Show your oldest item', meta:'@mikethunder · started 8h ago', value:'29.1k', unit:'participants' },
+      { name:'Switch outfits in 1 sec', meta:'@alexchen · started 10h ago', value:'17.8k', unit:'participants' },
+    ],
+    creators: [
+      { name:'@zoepark', meta:'3 challenges active', value:'94', unit:'spark score' },
+      { name:'@mikethunder', meta:'1 challenge trending', value:'81', unit:'spark score' },
+      { name:'@alexchen', meta:'2 challenges active', value:'76', unit:'spark score' },
+    ]
+  },
+  weekly: {
+    challenges: [
+      { name:'Describe your country in 3 words', meta:'@sunnydays · 3 days ago', value:'122k', unit:'participants' },
+      { name:'Recreate your childhood photo', meta:'@zoepark · 6 hours ago', value:'48.2k', unit:'participants' },
+      { name:'Show your oldest item', meta:'@mikethunder · 8 hours ago', value:'29.1k', unit:'participants' },
+    ],
+    creators: [
+      { name:'@sunnydays', meta:'Most reach this week', value:'122k', unit:'total reach' },
+      { name:'@zoepark', meta:'Fastest growing', value:'48.2k', unit:'total reach' },
+      { name:'@mikethunder', meta:'Most consistent', value:'29.1k', unit:'total reach' },
+    ]
+  },
+  monthly: {
+    challenges: [
+      { name:'The silent laugh challenge', meta:'@laughtrack · 18 days ago', value:'890k', unit:'participants' },
+      { name:'Describe your country in 3 words', meta:'@sunnydays · 3 days ago', value:'122k', unit:'participants' },
+      { name:'Recreate your childhood photo', meta:'@zoepark · 6 hours ago', value:'48.2k', unit:'participants' },
+    ],
+    creators: [
+      { name:'@laughtrack', meta:'Challenge went viral globally', value:'890k', unit:'total reach' },
+      { name:'@sunnydays', meta:'Consistently high engagement', value:'122k', unit:'total reach' },
+      { name:'@zoepark', meta:'3 trending challenges', value:'48.2k', unit:'total reach' },
+    ]
+  },
+  alltime: {
+    challenges: [
+      { name:'The silent laugh challenge', meta:'@laughtrack', value:'4.2M', unit:'participants' },
+      { name:'30-second desk workout', meta:'@gymrat99', value:'2.1M', unit:'participants' },
+      { name:'Describe your country in 3 words', meta:'@sunnydays', value:'890k', unit:'participants' },
+    ],
+    creators: [
+      { name:'@laughtrack', meta:'Top creator of all time', value:'4.2M', unit:'total reach' },
+      { name:'@gymrat99', meta:'Most consistent performer', value:'2.1M', unit:'total reach' },
+      { name:'@sunnydays', meta:'Most global reach', value:'890k', unit:'total reach' },
+    ]
+  }
+};
+
+function switchLbTab(tab, el) {
+  document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderLeaderboard(tab);
+}
+
+function renderLeaderboard(tab) {
+  const data = LB_DATA[tab];
+  const ranks = ['gold','silver','bronze'];
+  const medals = ['🥇','🥈','🥉'];
+
+  function rowsHtml(items) {
+    return items.map((item, i) => `
+      <div class="lb-row">
+        <div class="lb-rank ${ranks[i]}">${medals[i]}</div>
+        <div class="lb-info">
+          <div class="lb-name">${item.name}</div>
+          <div class="lb-meta">${item.meta}</div>
+        </div>
+        <div class="lb-value">${item.value} <span class="unit">${item.unit}</span></div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('lb-content').innerHTML = `
+    <div class="lb-section-title">🔥 Top challenges</div>
+    <div class="lb-list">${rowsHtml(data.challenges)}</div>
+    <div class="lb-section-title">⚡ Top creators</div>
+    <div class="lb-list">${rowsHtml(data.creators)}</div>
+  `;
+}
+
+function renderProfileChallenges() {
+  const mine = CHALLENGES.filter(c => c.mine);
+  const grid = document.getElementById('profile-challenges');
+  if (!mine.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">💡</div><h3>No challenges yet</h3><p>Create your first challenge and start the spark!</p></div>`;
+    return;
+  }
+  grid.innerHTML = mine.map(c => `
+    <div class="challenge-card" onclick="openChallenge(${c.id})">
+      <div class="card-top">
+        <span class="card-category">${c.category}</span>
+        <div class="virality-badge"><span>${c.sparks}</span><span style="font-size:11px;color:var(--muted);font-weight:400"> / 100</span></div>
+      </div>
+      <div class="card-title">${c.title}</div>
+      <div class="card-meta" style="margin-top:8px">
+        <div class="stat-item">👥 ${formatNum(c.participants)} participants</div>
+      </div>
+      <div class="spark-meter-wrap">
+        <div class="spark-meter"><div class="spark-meter-fill" style="width:${c.sparks}%"></div></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Close modal on overlay click
+document.getElementById('participate-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
